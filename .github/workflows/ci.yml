@@ -32,6 +32,17 @@ jobs:
       run: |
         docker run --rm -v "${{ github.workspace }}":/src zricethezav/gitleaks:latest detect --source /src --no-git -v || true
 
+    - name: Build Docker image
+      run: docker build -t my-flask-app .
+
+    - name: Scan Docker image with Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: my-flask-app
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+
     - name: Static Analysis with Bandit
       run: |
         pip install bandit
