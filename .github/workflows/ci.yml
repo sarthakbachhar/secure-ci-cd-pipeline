@@ -28,12 +28,9 @@ jobs:
       run: |
         python -m unittest discover tests
 
-    - name: Scan for secrets with Gitleaks
+    - name: Scan for secrets with Gitleaks (Docker)
       run: |
-        wget https://github.com/gitleaks/gitleaks/releases/download/v8.25.1/gitleaks-linux-amd64
-        mv gitleaks-linux-amd64 gitleaks
-        chmod +x gitleaks
-        ./gitleaks detect --source . --no-git -v || true
+        docker run --rm -v "${{ github.workspace }}":/src zricethezav/gitleaks:latest detect --source /src --no-git -v || true
 
     - name: Static Analysis with Bandit
       run: |
