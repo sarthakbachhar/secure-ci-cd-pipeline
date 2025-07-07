@@ -1,36 +1,29 @@
-# Secure CI/CD Pipeline with Flask, Docker, and GitHub Actions
+# Secure CI/CD Pipeline with Flask, Bandit, and Trivy
 
-This project demonstrates how to build a secure and automated CI/CD pipeline using a simple Python Flask application. The pipeline includes code testing, secret scanning, static analysis, Docker image building, and vulnerability scanning — all handled automatically via GitHub Actions.
+This project demonstrates a secure CI/CD pipeline implementation for a basic Python Flask web application. The application is containerized using Docker and integrated with GitHub Actions to perform static analysis and vulnerability scanning as part of the deployment workflow.
 
-## Features
-
-- Flask-based web application (returns "Hello Secure CI/CD")
-- Dockerized application for consistent deployment
-- Automated CI/CD using GitHub Actions
-- Unit testing using Python's `unittest`
-- Secret scanning using Gitleaks
-- Static code analysis using Bandit
-- Container vulnerability scanning using Trivy
+The project merges fundamental concepts from both cybersecurity and DevOps, aligning with modern DevSecOps practices.
 
 ---
 
-## Technologies Used
+## Features
 
-- Python 3.9
-- Flask
-- Docker
-- GitHub Actions
-- Gitleaks
-- Bandit
-- Trivy
+- Static code analysis using Bandit
+- Dockerized Python Flask application
+- CI/CD pipeline configured with GitHub Actions
+- Vulnerability scanning of Docker images using Trivy
+- Simple web interface rendered through Flask and HTML templates
 
 ---
 
 ## Project Structure
 
+
 secure-ci-cd-pipeline/
 - app/
   - main.py # Flask app
+  - templates/
+    - index.html # HTML template for web interface
 - tests/
   - test_app.py # Unit test for the Flask app
 - Dockerfile # Docker image definition
