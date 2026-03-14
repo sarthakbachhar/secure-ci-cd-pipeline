@@ -1,23 +1,22 @@
-# Use an official Python runtime as a parent image
+# start with the slim python image — keeps the container small
 FROM python:3.9-slim
 
-# Set working directory inside the container
 WORKDIR /app
 
-# Copy requirements file
+# copy requirements first so Docker can cache the dependency install layer
+# (if requirements don't change, this layer won't re-run on rebuilds)
 COPY requirements.txt .
 
-# Upgrade pip & setuptools first (to secure versions)
+# make sure pip and setuptools are up to date before installing anything
 RUN pip install --upgrade pip setuptools
 
-# Install dependencies
+# install our app's dependencies (no-cache keeps the image lean)
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the source code
+# now copy the actual source code
 COPY app ./app
 
-# Expose port 5000
 EXPOSE 5000
 
-# Run the app
+# fire up the flask server
 CMD ["python", "app/main.py"]

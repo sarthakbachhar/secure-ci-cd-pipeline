@@ -1,5 +1,6 @@
 name: Secure CI/CD Pipeline
 
+# Runs on every push or PR to main — this is where all the security checks happen
 on:
   push:
     branches: [main]
@@ -11,30 +12,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # grab the code first
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.9'
 
+    # install everything we need — app deps + testing tools
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install pytest
 
+    # run actual tests to make sure nothing is broken before we go further
     - name: Run tests
       run: |
-        python -m unittest discover tests
+        python -m pytest tests/ -v
 
-    - name: Scan for secrets with Gitleaks (Docker)
+    # check if anyone accidentally committed secrets (api keys, passwords, etc.)
+    - name: Scan for secrets with Gitleaks
       run: |
-        docker run --rm -v "${{ github.workspace }}":/src zricethezav/gitleaks:latest detect --source /src --no-git -v || true
+        docker run --rm -v "${{ github.workspace }}":/src zricethezav/gitleaks:latest detect --source /src --no-git -v
 
+    # scan our python dependencies for known vulnerabilities
+    - name: Audit Python dependencies
+      run: |
+        pip install pip-audit
+        pip-audit
+
+    # build the docker image so we can scan it next
     - name: Build Docker image
       run: docker build -t my-flask-app .
 
+    # scan the docker image for OS-level and package vulnerabilities
     - name: Scan Docker image with Trivy
       uses: aquasecurity/trivy-action@master
       with:
@@ -43,6 +57,7 @@ jobs:
         exit-code: '1'
         ignore-unfixed: true
 
+    # run bandit to catch common python security issues (sql injection, hardcoded passwords, etc.)
     - name: Static Analysis with Bandit
       run: |
         pip install bandit
